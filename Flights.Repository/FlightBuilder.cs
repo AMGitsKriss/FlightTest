@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Flights.DTO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Flights.Repository
 {
-    public class FlightBuilder
+    public class FlightBuilder : IFlightRepository
     {
         public IList<Flight> GetFlights()
         {
@@ -46,16 +47,5 @@ namespace Flights.Repository
 
             return new Flight { Segments = segments };
         }
-    }
-
-    public class Flight
-    {
-        public IList<Segment> Segments { get; set; }
-    }
-
-    public class Segment
-    {
-        public DateTime DepartureDate { get; set; }
-        public DateTime ArrivalDate { get; set; }
     }
 }
