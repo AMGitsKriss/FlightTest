@@ -1,20 +1,34 @@
 ﻿using Flights.DTO;
+using Flights.Logic.Filters;
+using Flights.Repository;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Flights.Logic
 {
-    class FlightFinder : IFlightFinder
+    public class FlightFinder : IFlightFinder
     {
-        public FlightFinder()
+        private readonly IFlightRepository _flightReepository;
+        private readonly IList<IFilterStrategy> _filters;
+
+        public FlightFinder(IFlightRepository flightReepository, IList<IFilterStrategy> filters)
         {
-            // TODO - Expect a collection of filters
+            _flightReepository = flightReepository;
+            _filters = filters;
         }
 
         public IList<Flight> FindFlights()
         {
-            throw new NotImplementedException();
+            IEnumerable<Flight> flightList = _flightReepository.GetFlights();
+
+            foreach (var filter in _filters)
+            {
+                flightList = filter.Filter(flightList);
+            }
+
+            return flightList.ToList();
         }
     }
 }

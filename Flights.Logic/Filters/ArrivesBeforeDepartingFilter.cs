@@ -1,7 +1,6 @@
 ﻿using Flights.DTO;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Flights.Logic.Filters
 {
@@ -9,7 +8,7 @@ namespace Flights.Logic.Filters
     {
         // TODO - Filter out flights that have any segment with an arrival date before the departure date
 
-        public IEquatable<Flight> Filter()
+        public IEnumerable<Flight> Filter(IEnumerable<Flight> flights)
         {
             throw new NotImplementedException();
         }

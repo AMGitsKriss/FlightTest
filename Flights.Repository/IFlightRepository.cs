@@ -5,6 +5,6 @@ namespace Flights.Repository
 {
     public interface IFlightRepository
     {
-        IList<Flight> GetFlights()
+        IList<Flight> GetFlights();
     }
 }

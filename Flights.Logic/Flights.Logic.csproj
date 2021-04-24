@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Flights.DTO\Flights.DTO.csproj" />
+    <ProjectReference Include="..\Flights.Repository\Flights.Repository.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,10 +1,11 @@
 ﻿using Flights.DTO;
 using System;
+using System.Collections.Generic;
 
 namespace Flights.Logic.Filters
 {
     public interface IFilterStrategy
     {
-        IEquatable<Flight> Filter();
+        IEnumerable<Flight> Filter(IEnumerable<Flight> flights);
     }
 }
