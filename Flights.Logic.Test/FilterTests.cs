@@ -1,6 +1,8 @@
+using Flights.DTO;
 using Flights.Logic.Filters;
 using Flights.Logic.Models;
 using Flights.Repository;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System.Collections.Generic;
 
@@ -9,11 +11,14 @@ namespace Flights.Logic.Test
     public class FilterTests
     {
         private IFlightRepository _flightRepository;
+        private IOptions<FilterSettingsConfig> _options;
 
         [SetUp]
         public void Setup()
         {
             _flightRepository = new FlightBuilder();
+            _options = Options.Create(new FilterSettingsConfig() { MaxLayoverHours = 2 }); // Could also use Moq
+
         }
 
         [Test]
@@ -23,7 +28,7 @@ namespace Flights.Logic.Test
             var expectedResultCount = 4;
             List<IFilterStrategy> filters = new List<IFilterStrategy>()
             {
-                new MaxLayoverFilter(2)
+                new MaxLayoverFilter(_options)
             };
             var flightfinder = new FlightFinder(_flightRepository, filters);
             var request = new FlightsRequest()
@@ -89,7 +94,7 @@ namespace Flights.Logic.Test
             var expectedResultCount = 2;
             List<IFilterStrategy> filters = new List<IFilterStrategy>()
             {
-                new MaxLayoverFilter(2),
+                new MaxLayoverFilter(_options),
                 new PastFlightsFilter(),
                 new ArrivesBeforeDepartingFilter()
             };
@@ -113,7 +118,7 @@ namespace Flights.Logic.Test
             //Given
             List<IFilterStrategy> filters = new List<IFilterStrategy>()
             {
-                new MaxLayoverFilter(2),
+                new MaxLayoverFilter(_options),
                 new PastFlightsFilter(),
                 new ArrivesBeforeDepartingFilter()
             };

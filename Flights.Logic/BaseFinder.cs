@@ -7,9 +7,9 @@ namespace Flights.Logic
 {
     public abstract class BaseFinder
     {
-        internal readonly IList<IFilterStrategy> _filters;
+        internal readonly IEnumerable<IFilterStrategy> _filters;
 
-        public BaseFinder(IList<IFilterStrategy> filters)
+        public BaseFinder(IEnumerable<IFilterStrategy> filters)
         {
             _filters = filters;
         }

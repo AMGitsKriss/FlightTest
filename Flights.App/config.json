@@ -1,0 +1,10 @@
+{
+  "FilterSettings": {
+    "MaxLayoverHours": 2,
+    "FiltersToUse": [
+      "ArrivesBeforeDepartingFilter",
+      "PastFlightsFilter",
+      "MaxLayoverFilter"
+    ]
+  }  
+}

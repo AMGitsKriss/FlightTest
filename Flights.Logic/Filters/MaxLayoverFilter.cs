@@ -1,4 +1,5 @@
 ﻿using Flights.DTO;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,9 @@ namespace Flights.Logic.Filters
     {
         private readonly int _hours;
 
-        public MaxLayoverFilter (int hours)
+        public MaxLayoverFilter (IOptions<FilterSettingsConfig> config)
         {
-            _hours = hours;
+            _hours = config.Value.MaxLayoverHours;
         }
 
         public IEnumerable<Flight> Filter(IEnumerable<Flight> flights)

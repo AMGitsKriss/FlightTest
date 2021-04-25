@@ -3,8 +3,12 @@ using Flights.Logic;
 using Flights.Logic.Filters;
 using Flights.Logic.Models;
 using Flights.Repository;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace Flights.App
 {
@@ -12,27 +16,43 @@ namespace Flights.App
     {
         static void Main(string[] args)
         {
-            // TODO - Dependency Injection
+            var serviceProvider = LoadServiceCollection();
 
-            IFlightRepository flightRepository = new FlightBuilder();
-
-            IList<IFilterStrategy> filters = new List<IFilterStrategy>()
-            {
-                new MaxLayoverFilter(2), // TODO - Load this "2" from a config
-                new PastFlightsFilter(),
-                new ArrivesBeforeDepartingFilter()
-            };
-
-            var flightfinder = new FlightFinder(flightRepository, filters);
+            var flightfinder = serviceProvider.GetService<IFlightFinder>();
+            var options = serviceProvider.GetService<IOptions<FilterSettingsConfig>>();
 
             var request = new FlightsRequest()
             {
-                Filters = new List<string> { "ArrivesBeforeDepartingFilter", "PastFlightsFilter", "MaxLayoverFilter" }
+                Filters = options.Value.FiltersToUse
             };
 
             var results = flightfinder.FindFlights(request);
 
             PrintResults(results.Results);
+        }
+
+        static ServiceProvider LoadServiceCollection()
+        {
+            var configuration = LoadConfiguration(); 
+            return new ServiceCollection()
+                .AddOptions()
+                .Configure<FilterSettingsConfig>(configuration.GetSection("FilterSettings"))
+                .AddScoped<IFilterStrategy, MaxLayoverFilter>()
+                .AddScoped<IFilterStrategy, PastFlightsFilter>()
+                .AddScoped<IFilterStrategy, ArrivesBeforeDepartingFilter>()
+                .AddScoped<IFlightRepository, FlightBuilder>()
+                .AddScoped<IFlightFinder, FlightFinder>()
+                .BuildServiceProvider();
+        }
+
+        static IConfigurationRoot LoadConfiguration()
+        {
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            .AddJsonFile("config.json", optional: false, reloadOnChange: true);
+
+            return builder.Build();
+
         }
 
         static void PrintResults(IList<Flight> results)

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Flights.Logic
 {
-    interface IFlightFinder
+    public interface IFlightFinder
     {
         IResponse<Flight> FindFlights(IRequest request);
     }

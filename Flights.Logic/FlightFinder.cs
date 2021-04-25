@@ -13,7 +13,7 @@ namespace Flights.Logic
     {
         private readonly IFlightRepository _flightRepository;
 
-        public FlightFinder(IFlightRepository flightRepository, IList<IFilterStrategy> filters) : base(filters)
+        public FlightFinder(IFlightRepository flightRepository, IEnumerable<IFilterStrategy> filters) : base(filters)
         {
             _flightRepository = flightRepository;
         }
