@@ -1,4 +1,5 @@
 ﻿using Flights.DTO;
+using Flights.Logic.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,6 +8,6 @@ namespace Flights.Logic
 {
     interface IFlightFinder
     {
-        IList<Flight> FindFlights();
+        IResponse<Flight> FindFlights(IRequest request);
     }
 }

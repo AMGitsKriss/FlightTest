@@ -1,4 +1,5 @@
 using Flights.Logic.Filters;
+using Flights.Logic.Models;
 using Flights.Repository;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -7,13 +8,12 @@ namespace Flights.Logic.Test
 {
     public class FilterTests
     {
-        private IFlightRepository flightRepository;
+        private IFlightRepository _flightRepository;
 
         [SetUp]
         public void Setup()
         {
-            flightRepository = new FlightBuilder();
-            // TODO - New up some filters
+            _flightRepository = new FlightBuilder();
         }
 
         [Test]
@@ -25,14 +25,17 @@ namespace Flights.Logic.Test
             {
                 new MaxLayoverFilter(2)
             };
-            var flightRepository = new FlightBuilder();
-            var flightfinder = new FlightFinder(flightRepository, filters);
+            var flightfinder = new FlightFinder(_flightRepository, filters);
+            var request = new FlightsRequest()
+            {
+                Filters = new List<string> { "MaxLayoverFilter" }
+            };
 
             //When
-            var results = flightfinder.FindFlights();
+            var results = flightfinder.FindFlights(request);
 
             //Then
-            Assert.AreEqual(expectedResultCount, results.Count);
+            Assert.AreEqual(expectedResultCount, results.Results.Count);
         }
 
         [Test]
@@ -44,14 +47,17 @@ namespace Flights.Logic.Test
             {
                 new PastFlightsFilter()
             };
-            var flightRepository = new FlightBuilder();
-            var flightfinder = new FlightFinder(flightRepository, filters);
+            var flightfinder = new FlightFinder(_flightRepository, filters);
+            var request = new FlightsRequest()
+            {
+                Filters = new List<string> { "PastFlightsFilter" }
+            };
 
             //When
-            var results = flightfinder.FindFlights();
+            var results = flightfinder.FindFlights(request);
 
             //Then
-            Assert.AreEqual(expectedResultCount, results.Count);
+            Assert.AreEqual(expectedResultCount, results.Results.Count);
         }
 
         [Test]
@@ -63,14 +69,17 @@ namespace Flights.Logic.Test
             {
                 new ArrivesBeforeDepartingFilter()
             };
-            var flightRepository = new FlightBuilder();
-            var flightfinder = new FlightFinder(flightRepository, filters);
+            var flightfinder = new FlightFinder(_flightRepository, filters);
+            var request = new FlightsRequest()
+            {
+                Filters = new List<string> { "ArrivesBeforeDepartingFilter"}
+            };
 
             //When
-            var results = flightfinder.FindFlights();
+            var results = flightfinder.FindFlights(request);
 
             //Then
-            Assert.AreEqual(expectedResultCount, results.Count);
+            Assert.AreEqual(expectedResultCount, results.Results.Count);
         }
 
         [Test]
@@ -84,14 +93,41 @@ namespace Flights.Logic.Test
                 new PastFlightsFilter(),
                 new ArrivesBeforeDepartingFilter()
             };
-            var flightRepository = new FlightBuilder();
-            var flightfinder = new FlightFinder(flightRepository, filters);
+            var flightfinder = new FlightFinder(_flightRepository, filters);
+            var request = new FlightsRequest()
+            {
+                Filters = new List<string> { "ArrivesBeforeDepartingFilter", "PastFlightsFilter", "MaxLayoverFilter" }
+            };
 
             //When
-            var results = flightfinder.FindFlights();
+            var results = flightfinder.FindFlights(request);
 
             //Then
-            Assert.AreEqual(expectedResultCount, results.Count);
+            Assert.AreEqual(expectedResultCount, results.Results.Count);
+            Assert.IsFalse(results.HasErrors);
+        }
+
+        [Test]
+        public void IncludeErrorWithInvalidFilterRequest()
+        {
+            //Given
+            List<IFilterStrategy> filters = new List<IFilterStrategy>()
+            {
+                new MaxLayoverFilter(2),
+                new PastFlightsFilter(),
+                new ArrivesBeforeDepartingFilter()
+            };
+            var flightfinder = new FlightFinder(_flightRepository, filters);
+            var request = new FlightsRequest()
+            {
+                Filters = new List<string> { "FakeFilter", "ArrivesBeforeDepartingFilter", "PastFlightsFilter", "MaxLayoverFilter" }
+            };
+
+            //When
+            var results = flightfinder.FindFlights(request);
+
+            //Then
+            Assert.IsTrue(results.HasErrors);
         }
     }
 }

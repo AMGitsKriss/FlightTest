@@ -1,6 +1,7 @@
 ﻿using Flights.DTO;
 using Flights.Logic;
 using Flights.Logic.Filters;
+using Flights.Logic.Models;
 using Flights.Repository;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace Flights.App
 
             IFlightRepository flightRepository = new FlightBuilder();
 
-            List<IFilterStrategy> filters = new List<IFilterStrategy>()
+            IList<IFilterStrategy> filters = new List<IFilterStrategy>()
             {
                 new MaxLayoverFilter(2), // TODO - Load this "2" from a config
                 new PastFlightsFilter(),
@@ -23,9 +24,15 @@ namespace Flights.App
             };
 
             var flightfinder = new FlightFinder(flightRepository, filters);
-            var results = flightfinder.FindFlights();
 
-            PrintResults(results);
+            var request = new FlightsRequest()
+            {
+                Filters = new List<string> { "ArrivesBeforeDepartingFilter", "PastFlightsFilter", "MaxLayoverFilter" }
+            };
+
+            var results = flightfinder.FindFlights(request);
+
+            PrintResults(results.Results);
         }
 
         static void PrintResults(IList<Flight> results)

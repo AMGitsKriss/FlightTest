@@ -1,5 +1,6 @@
 ﻿using Flights.DTO;
 using Flights.Logic.Filters;
+using Flights.Logic.Models;
 using Flights.Repository;
 using System;
 using System.Collections.Generic;
@@ -8,27 +9,31 @@ using System.Text;
 
 namespace Flights.Logic
 {
-    public class FlightFinder : IFlightFinder
+    public class FlightFinder : BaseFinder, IFlightFinder
     {
-        private readonly IFlightRepository _flightReepository;
-        private readonly IList<IFilterStrategy> _filters;
+        private readonly IFlightRepository _flightRepository;
 
-        public FlightFinder(IFlightRepository flightReepository, IList<IFilterStrategy> filters)
+        public FlightFinder(IFlightRepository flightRepository, IList<IFilterStrategy> filters) : base(filters)
         {
-            _flightReepository = flightReepository;
-            _filters = filters;
+            _flightRepository = flightRepository;
         }
 
-        public IList<Flight> FindFlights()
+        public IResponse<Flight> FindFlights(IRequest request)
         {
-            IEnumerable<Flight> flightList = _flightReepository.GetFlights();
+            IEnumerable<Flight> flightList = _flightRepository.GetFlights();
+            var selectedFilters = SelectFilters(request);
 
-            foreach (var filter in _filters)
+            foreach (var filter in selectedFilters.Results)
             {
                 flightList = filter.Filter(flightList);
             }
 
-            return flightList.ToList();
+            return new Response<Flight>()
+            {
+                Results = flightList.ToList(),
+                RequestedFilters = request.Filters,
+                Errors = selectedFilters.Errors
+            };
         }
     }
 }
