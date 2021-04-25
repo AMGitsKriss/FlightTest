@@ -1,16 +1,25 @@
 ﻿using Flights.DTO;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Flights.Logic.Filters
 {
-    class ArrivesBeforeDepartingFilter : IFilterStrategy
+    /// <summary>
+    /// Filter out flights that have any segment with an arrival date before the departure date
+    /// </summary>
+    public class ArrivesBeforeDepartingFilter : IFilterStrategy
     {
-        // TODO - Filter out flights that have any segment with an arrival date before the departure date
-
         public IEnumerable<Flight> Filter(IEnumerable<Flight> flights)
         {
-            throw new NotImplementedException();
+            var result = flights.Where(f => IsDepartureBeforeARrival(f.Segments));
+
+            return result;
+        }
+
+        public bool IsDepartureBeforeARrival(IList<Segment> segments)
+        {
+            return segments.Any(s => s.DepartureDate < s.ArrivalDate);
         }
     }
 }
